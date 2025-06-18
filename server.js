@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
   // Receive code changes and broadcast to others
   socket.on('codeUpdate', (newCode) => {
    const roomId = socket.roomId;
-   console.log(`Code update in room ${roomId}:`, newCode);
+ //  console.log(`Code update in room ${roomId}:`, newCode);
     if (!roomId) return;
 
     roomCodes[roomId] = newCode;

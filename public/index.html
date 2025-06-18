@@ -66,39 +66,47 @@
 
   require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.33.0/min/vs' } });
 
-  require(['vs/editor/editor.main'], function () {
-    editor = monaco.editor.create(document.getElementById('editor'), {
-      value: "// Start coding...\n",
-      language: currentLanguage,
-      theme: "vs-dark",
-      fontSize: 16,
-      automaticLayout: true
-    });
-    
+  let isUpdatingFromRemote = false;
 
-    socket.emit('joinRoom',roomId);
-
-    socket.on('codeUpdate', (code) => {
-      if (editor.getValue() !== code) {
-        const pos = editor.getPosition();
-        editor.setValue(code);
-        editor.setPosition(pos);
-      }
-    });
-
-    editor.onDidChangeModelContent(() => {
-      socket.emit('codeUpdate', editor.getValue());
-    });
-
-    document.getElementById('language-select').addEventListener('change', function () {
-      currentLanguage = this.value;
-      monaco.editor.setModelLanguage(editor.getModel(), currentLanguage);
-    });
-    document.getElementById('theme-select').addEventListener('change', function () {
-      const theme = this.value;
-      monaco.editor.setTheme(theme);
-    });
+require(['vs/editor/editor.main'], function () {
+  editor = monaco.editor.create(document.getElementById('editor'), {
+    value: "// Start coding...\n",
+    language: currentLanguage,
+    theme: "vs-dark",
+    fontSize: 16,
+    automaticLayout: true
   });
+
+  socket.on('codeUpdate', (code) => {
+    const currentCode = editor.getValue();
+    if (currentCode !== code) {
+      isUpdatingFromRemote = true; // 🚫 Avoid emitting
+      const pos = editor.getPosition();
+      editor.setValue(code);
+      editor.setPosition(pos);
+      isUpdatingFromRemote = false;
+    }
+  });
+
+  socket.emit('joinRoom', roomId);
+
+  editor.onDidChangeModelContent(() => {
+    if (!isUpdatingFromRemote) {
+      socket.emit('codeUpdate', editor.getValue());
+    }
+  });
+
+  document.getElementById('language-select').addEventListener('change', function () {
+    currentLanguage = this.value;
+    monaco.editor.setModelLanguage(editor.getModel(), currentLanguage);
+  });
+
+  document.getElementById('theme-select').addEventListener('change', function () {
+    const theme = this.value;
+    monaco.editor.setTheme(theme);
+  });
+});
+
   function downloadCode() {
   const code = editor.getValue(); // Get current code from Monaco
   const language = currentLanguage; // Example: "javascript", "python", "cpp"
