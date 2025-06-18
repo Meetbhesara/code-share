@@ -35,11 +35,24 @@
         border-radius: 5px;
         cursor: pointer;
     }
+    .btn2{
+        position: absolute;
+        z-index: 1;
+        margin-left: 10px;
+        top: 10px;
+        left: 100px;
+        padding: 5px 1-px;
+        background-color: #4CAF50;
+        color: white;
+        border: solid 2px black;
+        border-radius: 5px;
+        cursor: pointer;
+    }
   </style>
 </head>
 <body>
      <button  class="btn" onclick="downloadCode()">Download Code</button>
-  <select id="language-select" style="position: absolute; z-index: 1; top: 10px; left: 10px; padding: 5px;">
+  <select id="language-select" class="btn2">
     <option value="javascript">JavaScript</option>
     <option value="python">Python</option>
     <option value="cpp">C++</option>
